@@ -2,18 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "linked_list.h"
-
 typedef struct node
 {
-    Element element;
-    Position next;
+    Element element; // 当前元素
+    Position pre;    // 上一个节点
+    Position next;   // 下一个节点
 } Node;
 
 // 创建一个新表
 List MakeList()
 {
-    // 申请一块新内存
     List L = (List)malloc(sizeof(Node));
+    L->pre = NULL;
     L->next = NULL;
     return L;
 }
@@ -21,7 +21,7 @@ List MakeList()
 // 判断是否为空
 int IsEmpty(const List L)
 {
-    return L->next == NULL;
+    return L->next == NULL && L->pre == NULL;
 }
 
 // 判断是否为链表的最后一个元素
@@ -45,13 +45,12 @@ Position Find(const Element E, const List L)
 // 查找某个元素的上一个位置
 Position FindPrevious(Element E, List L)
 {
-    Position P = L;
-    // 当前元素的下一个节点的元素不相等继续找，如果相等了就返回
-    while (P != NULL && P->next->element != E)
+    Position P = Find(E, L);
+    if (P == NULL)
     {
-        P = P->next;
+        return NULL;
     }
-    return P;
+    return P->pre;
 }
 
 // 获取最后一个节点位置
@@ -68,42 +67,53 @@ Position FindLast(List L)
 // 删除某个元素
 int Delete(Element E, List L)
 {
-    // 找当前元素的前一个元素，目的在于可直接修改该元素的指针即可
-    Position P = FindPrevious(E, L);
-    // 当前元素
-    Position cur;
-    // 如果 E 不在列表中，P 应该是最后一个节点，因为 E不在链表中所以什么也不需要做
-    // 如果 E 是链表中的最后一个元素，P 是倒数第二个节点，cur->next 是 NULL，释放最后一个节点的内存，然后将 P 指向 NULL 也就是(cur->next)
-    if (!IsLast(P, L))
+    Position curNode = Find(E, L);
+    if (curNode == NULL)
     {
-        cur = P->next;
-        // 修改指针，指向当前元素的下一个元素
-        P->next = cur->next;
-        // 释放内存
-        free(cur);
-        return 0;
+        // not in
+        return -1;
     }
+    Position preNode = curNode->pre;
+    Position nextNode = curNode->next;
+    if (!IsLast(curNode, L))
+    {
+        preNode->next = curNode->next;
+        nextNode->pre = curNode->pre;
+    }
+    else
+    {
+        preNode->next == NULL;
+    }
+    free(curNode);
     return 0;
 }
 
-// 在某个位置后插入一个元素
+// 插入一个元素到指定位置
 int InsertPositon(Element E, List L, Position P)
 {
+
     if (P == NULL)
     {
         printf("cannot insert, position is not exist\n");
         return -1;
     }
-    Position newP = (Position)malloc(sizeof(Node));
-    if (newP == NULL)
+    Position newNode = (Position)malloc(sizeof(Node));
+    if (newNode == NULL)
     {
+        // 没有足够的内存
         return -1;
     }
-    newP->element = E;
-    // 新节点的下一个节点等于原位置的下一个节点
-    newP->next = P->next;
-    // 将原位置的下一个节点置位新的节点
-    P->next = newP;
+    Position nextNode = P->next;
+    newNode->element = E;
+    newNode->next = nextNode;
+
+    // 插入中间位置
+    P->next = newNode;
+    // 前节点可能是空的， NPE!!!
+    if (nextNode != NULL)
+    {
+        nextNode->pre = newNode;
+    }
     return 0;
 }
 
@@ -111,8 +121,14 @@ int InsertPositon(Element E, List L, Position P)
 int Insert(Element E, List L)
 {
     Position P = FindLast(L);
-    return InsertPositon(E, L, P);
+    InsertPositon(E, L, P);
+    return 0;
 }
+
+Position Header(const List L);
+Position First(const List L);
+Position Advance(Position P);
+Element Retrieve(Position P);
 
 void PrintList(List L)
 {
