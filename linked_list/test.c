@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "linked_list.h"
+void print_list(Element E);
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +19,12 @@ int main(int argc, char *argv[])
     }
     InsertPositon("6", L, P);
 
-    PrintList(L);
+    PrintList(L, &print_list);
     return 0;
+}
+
+void print_list(Element E)
+{
+    char *s = (char *)E;
+    printf("%s\n", s);
 }

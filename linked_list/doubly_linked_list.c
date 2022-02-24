@@ -130,12 +130,12 @@ Position First(const List L);
 Position Advance(Position P);
 Element Retrieve(Position P);
 
-void PrintList(List L)
+void PrintList(const List L, void (*pfunc)(Element E))
 {
     Position cur = L->next;
     while (cur != NULL)
     {
-        printf("%s\n", (char *)cur->element);
+        (*pfunc)(cur->element);
         cur = cur->next;
     }
 }

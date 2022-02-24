@@ -114,12 +114,12 @@ int Insert(Element E, List L)
     return InsertPositon(E, L, P);
 }
 
-void PrintList(List L)
+void PrintList(const List L, void (*pfunc)(Element E))
 {
     Position cur = L->next;
     while (cur != NULL)
     {
-        printf("%s\n", (char *)cur->element);
+        (*pfunc)(cur->element);
         cur = cur->next;
     }
 }

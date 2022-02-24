@@ -39,6 +39,6 @@ Position First(const List L);
 Position Advance(Position P);
 Element Retrieve(Position P);
 
-void PrintList(List L);
+void PrintList(const List L, void (*pfunc)(Element E));
 
 #endif
