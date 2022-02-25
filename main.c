@@ -7,10 +7,10 @@ void say(int num);
 
 int main(int argc, char *argv[])
 {
-    uint64_t fd;
-    set_fd(&fd);
-    int *num = (int *)fd;
-    printf("%d\n", *num);
+    // uint64_t fd;
+    // set_fd(&fd);
+    // int *num = (int *)fd;
+    // printf("%d\n", *num);
     printf("%p\n", &say);
     printf("%p\n", say);
     hello(10, say);
@@ -18,12 +18,12 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int set_fd(uint64_t *fd)
-{
-    int num = 100;
-    *fd = &num;
-    return 0;
-}
+// int set_fd(uint64_t *fd)
+// {
+//     int num = 100;
+//     *fd = &num;
+//     return 0;
+// }
 
 void hello(int num, void (*pfunc)(int))
 {
