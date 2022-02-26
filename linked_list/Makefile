@@ -1,15 +1,28 @@
 CC = gcc
-CFLAGS = -o
+CFLAGS = -c -o
 
+SRC_DIR = .
+TEST_DIR = ./test
+OBJ_DIR = ./build/lib
 
-all: test test_doubly
+SRC = $(wildcard $(SRC_DIR)/*.c)
+TEST = ${wildcard ${TEST_DIR}/*.c}
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-test: test.c linked_list.c linked_list.h
-	$(CC) $(CFLAGS) test test.c linked_list.c
+all:
+	mkdir -p ${OBJ_DIR}
+	$(MAKE) ${OBJ}
 
-test_doubly: test.c doubly_linked_list.c linked_list.h
-	$(CC) $(CFLAGS) test_doubly test.c doubly_linked_list.c
+.PHONY: $(OBJ)
+$(OBJ): $(SRC)
+	$(CC) $(CFLAGS) $@ $<
+
+.PHONY: test_all
+test_all: $(OBJ)
+	$(CC) -o $@ test/test.c $<
+
 
 .PHONY: clean
 clean:
-	rm -rf test
+	@echo "clean..."
+	rm -rf ./build

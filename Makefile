@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -o
+CFLAGS = -c -o
 
 SRC_DIR = ./
 OBJ_DIR = ./build
@@ -7,12 +7,10 @@ OBJ_DIR = ./build
 SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-all: main linked_list
+all:
+	mkdir -p ${OBJ_DIR}
+	$(MAKE) ${OBJ}
 
-.PHONY: main linked_list
-
-main: main.c
-	$(CC) $(CFLAGS) main main.c 
-
-linked_list:
-	$(MAKE) -C ./linked_list
+.PHONY: $(OBJ)
+${OBJ}: ${SRC}
+	$(CC) $(CFLAGS) $@ $<

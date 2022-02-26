@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "linked_list.h"
+#include "../linked_list.h"
 void print_list(Element E);
 
 int main(int argc, char *argv[])
