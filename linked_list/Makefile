@@ -8,8 +8,8 @@ BUILD_DIR = ./build
 SRC = $(wildcard $(SRC_DIR)/*.c)
 SRC_TEST = ${wildcard ${TEST_DIR}/*.c}
 
-OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/lib/%.o)
-OBJ_TEST = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_test)
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+OBJ_TEST = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/bin/%_test)
 TEST_FILE := ./test/test.c
 
 # $(info $(SRC))
@@ -17,9 +17,9 @@ TEST_FILE := ./test/test.c
 # $(info $(OBJ))
 # $(info $(OBJ_TEST))
 
-$(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/lib)
+$(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin)
 
-all: $(OBJ) 
+all: $(OBJ) test
 
 $(OBJ): $(SRC)
 	$(CC) $(CFLAGS) $@ $<
