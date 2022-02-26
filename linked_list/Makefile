@@ -3,24 +3,35 @@ CFLAGS = -c -o
 
 SRC_DIR = .
 TEST_DIR = ./test
-OBJ_DIR = ./build/lib
+BUILD_DIR = ./build
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
-TEST = ${wildcard ${TEST_DIR}/*.c}
-OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+SRC_TEST = ${wildcard ${TEST_DIR}/*.c}
 
-all:
-	mkdir -p ${OBJ_DIR}
-	$(MAKE) ${OBJ}
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/lib/%.o)
+OBJ_TEST = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_test)
+TEST_FILE := ./test/test.c
 
-.PHONY: $(OBJ)
+# $(info $(SRC))
+# $(info $(SRC_TEST))
+# $(info $(OBJ))
+# $(info $(OBJ_TEST))
+
+$(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/lib)
+
+all: $(OBJ) 
+
 $(OBJ): $(SRC)
 	$(CC) $(CFLAGS) $@ $<
 
-.PHONY: test_all
-test_all: $(OBJ)
-	$(CC) -o $@ test/test.c $<
+.PHONY: test run
+test: $(OBJ_TEST)
 
+$(OBJ_TEST): $(OBJ)
+	$(CC) $(TEST_FILE) $< -o $@
+
+run: $(OBJ_TEST)
+	$<
 
 .PHONY: clean
 clean:
