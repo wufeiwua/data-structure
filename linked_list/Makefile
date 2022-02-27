@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -c -o
+CFLAGS = -c
+INC=-I../include/
 
 SRC_DIR = .
 TEST_DIR = ./test
@@ -22,13 +23,13 @@ $(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin)
 all: $(OBJ) test
 
 $(OBJ): $(SRC)
-	$(CC) $(CFLAGS) $@ $<
+	$(CC) $(CFLAGS) $< $(INC) -o $@
 
 .PHONY: test run
 test: $(OBJ_TEST)
 
 $(OBJ_TEST): $(OBJ)
-	$(CC) $(TEST_FILE) $< -o $@
+	$(CC) $(TEST_FILE) $< $(INC) -o $@
 
 run: $(OBJ_TEST)
 	$<

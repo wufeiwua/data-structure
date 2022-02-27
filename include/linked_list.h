@@ -1,5 +1,5 @@
-#ifndef _LINKED_LIST_H_
-#define _LINKED_LIST_H_
+#ifndef _LINKED_LIST_H
+#define _LINKED_LIST_H
 
 struct node;                    // 定义节点
 typedef void *Element;          // 定义指向任意元素的指针，表示链表中的具体数据

@@ -1,18 +1,18 @@
 CC = gcc
-CFLAGS = -c -o
+CFLAGS = 
 
 SRC_DIR = ./
-OBJ_DIR = ./build
+BUILD_DIR = ./build
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
-OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/bin/%)
 
-$(shell mkdir -p ${OBJ_DIR} ${DDD_DIR})
+$(shell mkdir -p ${BUILD_DIR}/bin)
 
 all: $(OBJ)
 
 $(OBJ): $(SRC)
-	$(CC) $(CFLAGS) $@ $<
+	$(CC) $(CFLAGS) $< -o $@
 
 .PHONY: test
 test:
