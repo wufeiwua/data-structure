@@ -19,20 +19,24 @@ TEST_FILE := ./test/test.c
 # $(info $(OBJ_TEST))
 
 $(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin)
-
+.PHONY: test run
 all: $(OBJ) test
 
 $(OBJ): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $< $(INC) -o $@
 
-.PHONY: test run
-test: $(OBJ_TEST)
+test: $(OBJ_TEST) 
 
-$(OBJ_TEST): $(BUILD_DIR)/bin/%_test: $(BUILD_DIR)/%.o
+$(OBJ_TEST): $(BUILD_DIR)/bin/%_test: $(BUILD_DIR)/%.o $(TEST_FILE)
 	$(CC) $(TEST_FILE) $< $(INC) -o $@
 
-run: $(OBJ_TEST)
-	$<
+define run_test
+$(foreach item,$(OBJ_TEST),$(item)
+)
+endef
+
+run:
+	$(call run_test)
 
 .PHONY: clean
 clean:

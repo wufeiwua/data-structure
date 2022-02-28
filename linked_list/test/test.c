@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     InsertPositon("6", L, P);
 
     PrintList(L, &print_list);
+    printf("\n");
     return 0;
 }
 
