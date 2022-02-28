@@ -106,6 +106,7 @@ int InsertPositon(Element E, List L, Position P)
     Position nextNode = P->next;
     newNode->element = E;
     newNode->next = nextNode;
+    newNode->pre = P;
 
     // 插入中间位置
     P->next = newNode;
@@ -132,10 +133,18 @@ Element Retrieve(Position P);
 
 void PrintList(const List L, void (*pfunc)(Element E))
 {
+    printf("print list===\n");
     Position cur = L->next;
     while (cur != NULL)
     {
         (*pfunc)(cur->element);
         cur = cur->next;
+    }
+    printf("reverse===\n");
+    cur = FindLast(L);
+    while (cur->pre != NULL)
+    {
+        (*pfunc)(cur->element);
+        cur = cur->pre;
     }
 }

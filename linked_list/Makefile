@@ -22,13 +22,13 @@ $(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin)
 
 all: $(OBJ) test
 
-$(OBJ): $(SRC)
+$(OBJ): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $< $(INC) -o $@
 
 .PHONY: test run
 test: $(OBJ_TEST)
 
-$(OBJ_TEST): $(OBJ)
+$(OBJ_TEST): $(BUILD_DIR)/bin/%_test: $(BUILD_DIR)/%.o
 	$(CC) $(TEST_FILE) $< $(INC) -o $@
 
 run: $(OBJ_TEST)
