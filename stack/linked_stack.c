@@ -33,7 +33,18 @@ Stack MakeStack(void)
 }
 
 // 置空栈
-void MakeEmpty(Stack s);
+void MakeEmpty(Stack s)
+{
+    if (s == NULL)
+    {
+        printf("cannot empty, stack is NULL");
+        return;
+    }
+    while (!IsEmpty(s))
+    {
+        Pop(s);
+    }
+}
 
 // 插入一个元素
 void Push(Element e, Stack s)
@@ -79,9 +90,10 @@ void DisposeStack(Stack s);
 void PrintStack(Stack s, PtrFunc pfunc)
 {
     printf("print stack\n");
-    while (!IsEmpty(s))
+    Node *top = s;
+    while (top->next != NULL)
     {
-        pfunc(s->next->element);
-        Pop(s);
+        top = top->next;
+        pfunc(top->element);
     }
 }

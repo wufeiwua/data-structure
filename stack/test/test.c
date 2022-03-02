@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stack.h>
 
-void print_statc(Element);
+void print_stack(Element);
 
 int main(int argc, char const *argv[])
 {
@@ -25,14 +25,19 @@ int main(int argc, char const *argv[])
     Push("8", stack);
     Push("9", stack);
     Push("10", stack);
+    Push("11", stack);
+    Push("12", stack);
 
-    PrintStack(stack, &print_statc);
+    PrintStack(stack, &print_stack);
+    PrintStack(stack, &print_stack);
+    MakeEmpty(stack);
+    PrintStack(stack, print_stack);
 
     printf("\n");
     return 0;
 }
 
-void print_statc(Element e)
+void print_stack(Element e)
 {
     // 强转
     char *s = (char *)e;
