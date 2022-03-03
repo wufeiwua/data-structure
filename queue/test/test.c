@@ -14,6 +14,11 @@ int main(int argc, char const *argv[])
     Enqueue("6", q);
     Enqueue("7", q);
     Dequeue(q);
+    Dequeue(q);
+    Dequeue(q);
+    PrintQueue(q, print_queue);
+    MakeEmpty(q);
+    Dequeue(q);
     PrintQueue(q, print_queue);
     return 0;
 }

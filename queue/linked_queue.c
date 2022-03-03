@@ -12,18 +12,18 @@ typedef struct node
 Queue MakeQueue(void)
 {
     Queue q = (Queue)malloc(sizeof(Node));
-    return NULL;
+    q->next = NULL;
+    return q;
 }
 
 // 置空队列
 void MakeEmpty(Queue q)
 {
-    Node *front = q;
-    while (front->next != NULL)
+    while (q->next != NULL)
     {
-        Node *next = front->next;
-        free(front);
-        front = next;
+        Node *next = q->next;
+        q->next = next->next;
+        free(next);
     }
 }
 
@@ -57,7 +57,7 @@ Element Dequeue(Queue q)
     Node *front = q->next;
     if (front == NULL)
     {
-        printf("cannot dequeue, queue is empty");
+        printf("cannot dequeue, queue is empty.\n");
         return NULL;
     }
     q->next = front->next;
@@ -68,11 +68,12 @@ Element Dequeue(Queue q)
 
 void PrintQueue(Queue q, void (*pfunc)(Element e))
 {
-    Node *front = q;
-    while (front->next != NULL)
+    printf("print queue\n");
+    Node *front = q->next;
+    while (front != NULL)
     {
-        front = q->next;
         Element e = front->element;
         pfunc(e);
+        front = front->next;
     }
 }
