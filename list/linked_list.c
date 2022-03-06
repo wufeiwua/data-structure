@@ -128,6 +128,11 @@ void Reverse(List list)
     list->last = first;
 }
 
+int GetSize(const List list)
+{
+    return list->length;
+}
+
 Element Retrieve(Position positon)
 {
     if (positon != NULL)

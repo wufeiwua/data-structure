@@ -17,6 +17,7 @@ int Remove(Element element, List list);
 Position Previous(Element element, const List list);
 Position Find(Element element, const List list);
 void Reverse(List list);
+int GetSize(const List list);
 
 void PrintList(const List list, void (*pfunc)(Element element));
 Element Retrieve(Position positon);

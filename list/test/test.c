@@ -23,10 +23,14 @@ int main(int argc, char const *argv[])
     Remove("3", list);
     PrintList(list, print_list);
 
+    printf("size is %d.\n", GetSize(list));
+
     Add("1", list);
     Add("2", list);
     Add("3", list);
     PrintList(list, print_list);
+
+    printf("size is %d.\n", GetSize(list));
     return 0;
 }
 
