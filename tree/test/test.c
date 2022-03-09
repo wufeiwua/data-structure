@@ -57,8 +57,8 @@ void print_tree_preorder(PtrNode rootNode)
     }
     int item = *(int *)rootNode->item;
     printf("%d\n", item);
-    print_tree_inorder(rootNode->left);
-    print_tree_inorder(rootNode->right);
+    print_tree_preorder(rootNode->left);
+    print_tree_preorder(rootNode->right);
 }
 
 void print_tree_postorder(PtrNode rootNode)
@@ -68,7 +68,7 @@ void print_tree_postorder(PtrNode rootNode)
         return;
     }
     int item = *(int *)rootNode->item;
-    print_tree_inorder(rootNode->left);
-    print_tree_inorder(rootNode->right);
+    print_tree_postorder(rootNode->left);
+    print_tree_postorder(rootNode->right);
     printf("%d\n", item);
 }
