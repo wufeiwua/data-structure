@@ -4,7 +4,7 @@
 #include "tree.h"
 typedef struct node
 {
-    Element item;
+    int item;
     PtrNode left;
     PtrNode right;
 } TreeNode;
@@ -17,9 +17,9 @@ typedef struct tree
 PtrTree MakeTree();
 void MakeEmpty();
 PtrNode GetRoot(PtrTree tree);
-PtrNode Find(Element element, PtrNode rootNode);
+PtrNode Find(int element, PtrNode rootNode);
 
-PtrNode Insert(Element element, PtrNode rootNode);
-int Delete(Element element, PtrNode rootNode);
+PtrNode Insert(int element, PtrTree tree);
+PtrNode Delete(int element, PtrTree tree);
 
 #endif
