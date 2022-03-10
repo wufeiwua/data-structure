@@ -133,7 +133,7 @@ PtrNode DeleteNode(int element, PtrNode rootNode)
             rootNode->right = DeleteNode(rootNode->item, rootNode->right);
         }
 
-        // 只有一个子节点
+        // 只有一个子节点，或者没有子节点
         else
         {
             PtrNode node = rootNode;
