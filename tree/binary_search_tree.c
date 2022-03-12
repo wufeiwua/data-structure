@@ -20,7 +20,16 @@ PtrTree MakeTree()
     return tree;
 }
 
-void MakeEmpty();
+PtrNode MakeEmpty(PtrNode rootNode)
+{
+    while (rootNode != NULL)
+    {
+        rootNode->left = MakeEmpty(rootNode->left);
+        rootNode->right = MakeEmpty(rootNode->right);
+        free(rootNode);
+    }
+    return NULL;
+}
 
 PtrNode GetRoot(PtrTree tree)
 {

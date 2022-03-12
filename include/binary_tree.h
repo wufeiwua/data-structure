@@ -15,7 +15,7 @@ typedef struct tree
 } BinaryTree;
 
 PtrTree MakeTree();
-void MakeEmpty();
+PtrNode MakeEmpty(PtrNode rootNode);
 PtrNode GetRoot(PtrTree tree);
 PtrNode Find(int element, PtrNode rootNode);
 
