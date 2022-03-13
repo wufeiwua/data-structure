@@ -5,6 +5,7 @@
 typedef struct node
 {
     int item;
+    int height;
     PtrNode left;
     PtrNode right;
 } TreeNode;

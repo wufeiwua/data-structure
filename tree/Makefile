@@ -6,32 +6,18 @@ SRC_DIR = .
 TEST_DIR = ./test
 BUILD_DIR = ./build
 
-SRC = $(wildcard $(SRC_DIR)/*.c)
-SRC_TEST = ${wildcard ${TEST_DIR}/*.c}
-
-OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-OBJ_TEST = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/bin/%_test)
-TEST_FILE := ./test/test.c
-
 $(shell mkdir -p $(BUILD_DIR) $(BUILD_DIR)/bin)
-.PHONY: test run
-all: $(OBJ) test
 
-$(OBJ): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $< $(INC) -o $@
+.PHONY: all binary_search_tree avl_tree
 
-test: $(OBJ_TEST) 
+all: binary_search_tree avl_tree
 
-$(OBJ_TEST): $(BUILD_DIR)/bin/%_test: $(BUILD_DIR)/%.o $(TEST_FILE)
-	$(CC) $(TEST_FILE) $< $(INC) -o $@
+binary_search_tree: binary_search_tree.c test/binary_search_tree_test.c
+	$(CC) $(INC)  binary_search_tree.c test/binary_search_tree_test.c -o $(BUILD_DIR)/bin/binary_search_tree_test
 
-define run_test
-$(foreach item,$(OBJ_TEST),$(item)
-)
-endef
+avl_tree: avl_tree.c test/avl_tree_test.c
+	$(CC) $(INC) avl_tree.c test/avl_tree_test.c -o $(BUILD_DIR)/bin/avl_tree_test
 
-run:
-	$(call run_test)
 
 .PHONY: clean
 clean:
