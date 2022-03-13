@@ -11,6 +11,7 @@ PtrNode FindMax(PtrNode rootNode);
 PtrNode InsertNode(int element, PtrNode rootNode);
 PtrNode DeleteNode(int element, PtrNode rootNode);
 int Height(PtrNode node);
+int GetBalance(PtrNode node);
 // LL，右旋一次
 PtrNode LLRotate(PtrNode node);
 // LR，左旋一次 -> LL -> 右旋一次
@@ -108,39 +109,11 @@ PtrNode InsertNode(int element, PtrNode rootNode)
     {
         // ***递归插入到子节点***
         rootNode->left = InsertNode(element, rootNode->left);
-        // 节点左边失衡
-        if (Height(rootNode->left) - Height(rootNode->right) == 2)
-        {
-            // 左子树左边插入， LL 情形，向右旋转一次
-            if (element < rootNode->left->item)
-            {
-                rootNode = LLRotate(rootNode);
-            }
-            // 左子树右边插入，LR 情形，向左旋再向右旋转
-            else
-            {
-                rootNode = LRRotate(rootNode);
-            }
-        }
     }
     else if (element > rootNode->item)
     {
         // ***递归插入到子节点***
         rootNode->right = InsertNode(element, rootNode->right);
-        // 节点右边失衡
-        if (Height(rootNode->left) - Height(rootNode->right) == -2)
-        {
-            // 右子树右边插入， RR 情形，向左旋转一次
-            if (element > rootNode->right->item)
-            {
-                rootNode = RRRotate(rootNode);
-            }
-            // 左子树右边插入，RL 情形，向右旋再向左旋转
-            else
-            {
-                rootNode = RLRotate(rootNode);
-            }
-        }
     }
     else
     {
@@ -149,6 +122,43 @@ PtrNode InsertNode(int element, PtrNode rootNode)
 
     // 更新节点高度
     rootNode->height = MAX(Height(rootNode->left), Height(rootNode->right)) + 1;
+
+    /* 插入和删除都一样存在 4 种情况 LL、RR、LR、RL */
+    /*
+    第一个平衡因子是当前节点的平衡状态
+    balance = H(left) - H(right)
+    如果这个高度高于 1 ，那么这个就是不平衡的。再插入之前，左节点或右节点肯定是平衡状态，而插入导致了不平衡
+    如果左树更高： balance == 2 (> 1)
+         1. 看左节点的平衡因子
+         2. 如果平衡因子 大于或等于 0，说明节点是 插入到左节点的左边的，也就是 LL
+         3. 如果平衡因子 小于 0， 说明节点是插入到左节点的右边的，也就是 LR
+    如果右子树更高: balance == -2 (< -1)
+         1. 看右节点的平衡因子
+         2. 如果平衡因子 小于等于 0， 说明节点是插入到右节点的右边的(右边高度增加，现在变得更高)，也就是 RR
+         3. 如果平衡因子 大于 0, 说明节点是插入到右节点的左边的（左边高度增加，变得更高），也就是 RL
+     */
+    int balance = GetBalance(rootNode);
+    // LL
+    if (balance == 2 && GetBalance(rootNode->left) >= 0)
+    {
+        rootNode = LLRotate(rootNode);
+    }
+    // LR
+    if (balance == 2 && GetBalance(rootNode->left) < 0)
+    {
+        rootNode = LRRotate(rootNode);
+    }
+    // RR
+    if (balance == -2 && GetBalance(rootNode->right) <= 0)
+    {
+        rootNode = RRRotate(rootNode);
+    }
+    // RL
+    if (balance == -2 && GetBalance(rootNode->right) > 0)
+    {
+        rootNode = RLRotate(rootNode);
+    }
+
     return rootNode;
 }
 
@@ -193,40 +203,44 @@ PtrNode DeleteNode(int element, PtrNode rootNode)
             free(temp);
         }
     }
-
-    // 删除后判断节点是否平衡
-    if (rootNode != NULL)
+    // 删除的叶子节点
+    if (rootNode == NULL)
     {
-        int balance = Height(rootNode->left) - Height(rootNode->right);
-        // 删除左子树某个节点，右子树会失衡，所以右子树应该更高
-        if (balance == -2)
-        {
-            // 判断右子树失去平衡，如果右子树的右节点更高，说明是 RR
-            if (Height(rootNode->right) >= Height(rootNode->left))
-            {
-                rootNode = RRRotate(rootNode);
-            }
-            else
-            {
-                rootNode = RLRotate(rootNode);
-            }
-        }
-        // 删除右子树某个节点，左子树会失衡，所以左子树应该更高
-        else if (balance == 2)
-        {
-            // 判断左子树的失衡情形，如果左节点更高，说明是 LL
-            if (Height(rootNode->left) >= Height(rootNode->right))
-            {
-                printf("sdfasdfasdf\n");
-                rootNode = LLRotate(rootNode);
-            }
-            else
-            {
-                printf("-=-=-=-=-=\n");
-                rootNode = LRRotate(rootNode);
-            }
-        }
-        rootNode->height = MAX(Height(rootNode->left), Height(rootNode->right)) + 1;
+        return NULL;
+    }
+
+    // 更新高度
+    rootNode->height = MAX(Height(rootNode->left), Height(rootNode->right)) + 1;
+
+    int balance = GetBalance(rootNode);
+
+    /*
+     情况和插入节点一样，一开始节点是平衡的，但是删除节点导致了不平衡
+     balance > 1 证明左边失去了平衡，左子树更高
+     如果左子树更高:
+         1. 看左节点的平衡因子 x
+         2. 如果 x >=0， 说明左边还是更高，是 LL
+         3. 如果 x < 0， 说明右边更高，是 LR
+     如果右子树更高：
+         1. 看右节点的平衡因子 y
+         2. 如果 y >=0，说明左边还是更高，是 RL
+         3. 如果 y <0 ，说明右节点跟高，是 RR
+     */
+    if (balance > 1 && GetBalance(rootNode->left) >= 0)
+    {
+        rootNode = LLRotate(rootNode);
+    }
+    if (balance > 1 && GetBalance(rootNode->left) < 0)
+    {
+        rootNode = LRRotate(rootNode);
+    }
+    if (balance < -1 && GetBalance(rootNode->right) >= 0)
+    {
+        rootNode = RLRotate(rootNode);
+    }
+    if (balance < -1 && GetBalance(rootNode->right) < 0)
+    {
+        rootNode = RRRotate(rootNode);
     }
     return rootNode;
 }
@@ -258,6 +272,15 @@ int Height(PtrNode node)
         return 0;
     }
     return node->height;
+}
+
+int GetBalance(PtrNode node)
+{
+    if (node == NULL)
+    {
+        return 0;
+    }
+    return Height(node->left) - Height(node->right);
 }
 
 // LL，右旋一次
