@@ -154,6 +154,80 @@ PtrNode InsertNode(int element, PtrNode rootNode)
 
 PtrNode DeleteNode(int element, PtrNode rootNode)
 {
+    if (rootNode == NULL)
+    {
+        printf("cannot delete, element is not exist.\n");
+        return NULL;
+    }
+    if (element < rootNode->item)
+    {
+        rootNode->left = DeleteNode(element, rootNode->left);
+    }
+    else if (element > rootNode->item)
+    {
+        rootNode->right = DeleteNode(element, rootNode->right);
+    }
+    else
+    {
+        if (rootNode->left != NULL && rootNode->right != NULL)
+        {
+            PtrNode min = FindMin(rootNode->right);
+            rootNode->item = min->item;
+            rootNode->right = DeleteNode(min->item, rootNode->right);
+        }
+        else
+        {
+            PtrNode temp = rootNode;
+            if (rootNode->left != NULL && rootNode->right == NULL)
+            {
+                rootNode = rootNode->left;
+            }
+            else if (rootNode->left == NULL && rootNode->right != NULL)
+            {
+                rootNode = rootNode->right;
+            }
+            else
+            {
+                rootNode = NULL;
+            }
+            free(temp);
+        }
+    }
+
+    // 删除后判断节点是否平衡
+    if (rootNode != NULL)
+    {
+        int balance = Height(rootNode->left) - Height(rootNode->right);
+        // 删除左子树某个节点，右子树会失衡，所以右子树应该更高
+        if (balance == -2)
+        {
+            // 判断右子树失去平衡，如果右子树的右节点更高，说明是 RR
+            if (Height(rootNode->right) >= Height(rootNode->left))
+            {
+                rootNode = RRRotate(rootNode);
+            }
+            else
+            {
+                rootNode = RLRotate(rootNode);
+            }
+        }
+        // 删除右子树某个节点，左子树会失衡，所以左子树应该更高
+        else if (balance == 2)
+        {
+            // 判断左子树的失衡情形，如果左节点更高，说明是 LL
+            if (Height(rootNode->left) >= Height(rootNode->right))
+            {
+                printf("sdfasdfasdf\n");
+                rootNode = LLRotate(rootNode);
+            }
+            else
+            {
+                printf("-=-=-=-=-=\n");
+                rootNode = LRRotate(rootNode);
+            }
+        }
+        rootNode->height = MAX(Height(rootNode->left), Height(rootNode->right)) + 1;
+    }
     return rootNode;
 }
 

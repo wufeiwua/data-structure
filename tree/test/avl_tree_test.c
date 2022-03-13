@@ -10,18 +10,18 @@ int main(int argc, char const *argv[])
 
     PtrTree tree = MakeTree();
 
-    Insert(3, tree);
-    Insert(2, tree);
+    // Insert(3, tree);
+    // Insert(2, tree);
 
-    // 单旋
-    Insert(1, tree);
+    // // 单旋
+    // Insert(1, tree);
 
-    Insert(4, tree);
+    // Insert(4, tree);
 
-    // 单旋
-    Insert(5, tree);
-    Insert(6, tree);
-    Insert(7, tree);
+    // // 单旋
+    // Insert(5, tree);
+    // Insert(6, tree);
+    // Insert(7, tree);
 
     Insert(16, tree);
 
@@ -42,6 +42,23 @@ int main(int argc, char const *argv[])
     Insert(9, tree);
 
     PtrNode root = GetRoot(tree);
+    printf("inorder===\n");
+    print_tree_inorder(root);
+    printf("preorder===\n");
+    print_tree_preorder(root);
+    printf("postorder===\n");
+    print_tree_postorder(root);
+
+    // delete test
+
+    // Delete(5, tree);
+    // Delete(6, tree);
+    Delete(8, tree);
+    Delete(11, tree);
+    // Delete(12, tree);
+
+    root = GetRoot(tree);
+    printf("after delete===\n");
     printf("inorder===\n");
     print_tree_inorder(root);
     printf("preorder===\n");
