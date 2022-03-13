@@ -12,13 +12,13 @@ PtrNode InsertNode(int element, PtrNode rootNode);
 PtrNode DeleteNode(int element, PtrNode rootNode);
 int Height(PtrNode node);
 // LL，右旋一次
-PtrNode SingleRotateWithLeft(PtrNode node);
+PtrNode LLRotate(PtrNode node);
 // LR，左旋一次 -> LL -> 右旋一次
-PtrNode DoubleRotateWithLeft(PtrNode node);
+PtrNode LRRotate(PtrNode node);
 // RR 左旋一次
-PtrNode SingleRotateWithRight(PtrNode node);
+PtrNode RRRotate(PtrNode node);
 // RL 右旋一次 -> RR -> 左旋一次
-PtrNode DoubleRotateWithRight(PtrNode node);
+PtrNode RLRotate(PtrNode node);
 
 /* =============== implementation ================ */
 
@@ -114,12 +114,12 @@ PtrNode InsertNode(int element, PtrNode rootNode)
             // 左子树左边插入， LL 情形，向右旋转一次
             if (element < rootNode->left->item)
             {
-                rootNode = SingleRotateWithLeft(rootNode);
+                rootNode = LLRotate(rootNode);
             }
             // 左子树右边插入，LR 情形，向左旋再向右旋转
             else
             {
-                rootNode = DoubleRotateWithLeft(rootNode);
+                rootNode = LRRotate(rootNode);
             }
         }
     }
@@ -133,12 +133,12 @@ PtrNode InsertNode(int element, PtrNode rootNode)
             // 右子树右边插入， RR 情形，向左旋转一次
             if (element > rootNode->right->item)
             {
-                rootNode = SingleRotateWithRight(rootNode);
+                rootNode = RRRotate(rootNode);
             }
             // 左子树右边插入，RL 情形，向右旋再向左旋转
             else
             {
-                rootNode = DoubleRotateWithRight(rootNode);
+                rootNode = RLRotate(rootNode);
             }
         }
     }
@@ -187,7 +187,7 @@ int Height(PtrNode node)
 }
 
 // LL，右旋一次
-PtrNode SingleRotateWithLeft(PtrNode k2)
+PtrNode LLRotate(PtrNode k2)
 {
     /* X、Y、Z 是子树， k2 是旋转的根节点
                   通过一次右旋
@@ -214,7 +214,7 @@ PtrNode SingleRotateWithLeft(PtrNode k2)
 }
 
 // RR 左旋一次
-PtrNode SingleRotateWithRight(PtrNode k2)
+PtrNode RRRotate(PtrNode k2)
 {
     /* X、Y、Z 是子树， k2 是旋转的根节点
                  通过一次左旋
@@ -237,7 +237,7 @@ PtrNode SingleRotateWithRight(PtrNode k2)
 }
 
 // LR，左旋一次 -> LL -> 右旋一次
-PtrNode DoubleRotateWithLeft(PtrNode k3)
+PtrNode LRRotate(PtrNode k3)
 {
     /* 对于 LR ，k3 节点不平衡，但是一次单旋不能改变平衡状态，
     所以需要以 k1 为根，对 k2 做一次左单旋，转为 LL
@@ -250,12 +250,12 @@ PtrNode DoubleRotateWithLeft(PtrNode k3)
         /  \        /  \
         B   C      A    B
     */
-    k3->left = SingleRotateWithRight(k3->left);
-    return SingleRotateWithLeft(k3);
+    k3->left = RRRotate(k3->left);
+    return LLRotate(k3);
 }
 
 // RL 右旋一次 -> RR -> 左旋一次
-PtrNode DoubleRotateWithRight(PtrNode k3)
+PtrNode RLRotate(PtrNode k3)
 {
     /* 和 LR 情形类似，不过反向操作，先做一次右单旋，再做一次左单旋
 
@@ -267,6 +267,6 @@ PtrNode DoubleRotateWithRight(PtrNode k3)
            /  \                 /  \
            B   C               C    D
      */
-    k3->right = SingleRotateWithLeft(k3->right);
-    return SingleRotateWithRight(k3);
+    k3->right = LLRotate(k3->right);
+    return RRRotate(k3);
 }
