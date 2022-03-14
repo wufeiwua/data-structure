@@ -7,6 +7,7 @@
 
 PtrNode FindMin(PtrNode rootNode);
 PtrNode FindMax(PtrNode rootNode);
+PtrNode FindNode(int element, PtrNode rootNode);
 PtrNode InsertNode(int element, PtrNode rootNode);
 PtrNode DeleteNode(int element, PtrNode rootNode);
 
@@ -36,7 +37,12 @@ PtrNode GetRoot(PtrTree tree)
     return tree->root;
 }
 
-PtrNode Find(int element, PtrNode rootNode)
+PtrNode Find(int element, PtrTree tree)
+{
+    return FindNode(element, tree->root);
+}
+
+PtrNode FindNode(int element, PtrNode rootNode)
 {
     PtrNode root = rootNode;
     if (root == NULL)
@@ -46,11 +52,11 @@ PtrNode Find(int element, PtrNode rootNode)
     }
     if (element < root->item)
     {
-        return Find(element, root->left);
+        return FindNode(element, root->left);
     }
     else if (element > root->item)
     {
-        return Find(element, root->right);
+        return FindNode(element, root->right);
     }
     else
     {

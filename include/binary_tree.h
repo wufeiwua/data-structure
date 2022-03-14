@@ -5,9 +5,10 @@
 typedef struct node
 {
     int item;
-    int height;
     PtrNode left;
     PtrNode right;
+    int height;     // AVL_Tree
+    PtrNode parent; // Splay_Tree
 } TreeNode;
 
 typedef struct tree
@@ -18,7 +19,7 @@ typedef struct tree
 PtrTree MakeTree();
 PtrNode MakeEmpty(PtrNode rootNode);
 PtrNode GetRoot(PtrTree tree);
-PtrNode Find(int element, PtrNode rootNode);
+PtrNode Find(int element, PtrTree tree);
 
 PtrNode Insert(int element, PtrTree tree);
 PtrNode Delete(int element, PtrTree tree);
