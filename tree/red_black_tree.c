@@ -16,25 +16,17 @@
 5.从任一结点到其每个叶子的所有路径都包含相同数目的黑色结点。
 
  */
-typedef enum Position
-{
-    NONE,
-    LEFT,
-    RIGHT,
-} Position;
 
 PtrNode FixAfterInsertion(PtrNode node);
 PtrNode FixAfterDeletion(PtrNode node);
-PtrNode GetUncle(PtrNode node);
 PtrNode LeftRoate(PtrNode node);
 PtrNode RightRoate(PtrNode node);
 PtrNode NewNode(ElementType value, PtrNode parent);
 
-PtrNode Insert(ElementType value, PtrNode node)
+PtrNode Insert(ElementType value, PtrNode root)
 {
-    PtrNode cur = node;
+    PtrNode cur = root;
     PtrNode parent = NULL;
-    Position pos = NONE;
     // 查找父节点
     while (cur != NULL)
     {
@@ -42,40 +34,26 @@ PtrNode Insert(ElementType value, PtrNode node)
         if (value < cur->value)
         {
             cur = cur->left;
-            pos = LEFT;
         }
         else if (value > cur->value)
         {
             cur = cur->right;
-            pos = RIGHT;
         }
     }
 
     cur = NewNode(value, parent);
-    if (pos == LEFT)
-    {
-        parent->left = cur;
-    }
-    else if (pos == RIGHT)
-    {
-        parent->right = cur;
-    }
-
     // // 从当前节点自底向上平衡
-    // while (cur)
-    // {
-    //     cur = FixAfterInsertion(cur);
-    //     if (cur->parent == NULL)
-    //     {
-    //         cur->color = BLACK;
-    //         break;
-    //     }
-    // }
-    if (node == NULL)
+    while (cur)
     {
-        node = cur;
+        cur = FixAfterInsertion(cur);
+        if (cur->parent == NULL)
+        {
+            cur->color = BLACK;
+            root = cur;
+            break;
+        }
     }
-    return node;
+    return root;
 }
 
 PtrNode Delete(ElementType value);
@@ -87,9 +65,13 @@ PtrNode FixAfterInsertion(PtrNode node)
     {
         return node;
     }
+    // 当前节点如果是黑色，直接处理父亲节点
+    if (node->color == BLACK)
+    {
+        return node->parent;
+    }
 
     PtrNode parent = node->parent;
-    PtrNode uncle = GetUncle(node);
 
     // case1: 父节点为空，此节点是根节点
     if (parent == NULL)
@@ -98,63 +80,58 @@ PtrNode FixAfterInsertion(PtrNode node)
         return node;
     }
     // case2: 父亲是黑色节点，直接插入
-    else if (node->parent && node->parent->color == BLACK)
+    else if (parent->color == BLACK)
     {
-        return node->parent;
+        return parent;
     }
-    // case3: 叔叔存在且父亲和叔叔为红色。变色，父亲和叔叔变为黑色。祖父变为红色
-    else if (parent && uncle && uncle->color == RED)
+
+    PtrNode gradpa = parent->parent;
+    if (gradpa)
     {
-        parent->color = uncle->color = BLACK;
-        parent->parent->color = RED;
-        return parent->parent;
-    }
-    // 此时，由于红黑树特性，该节点的祖父必定存在。case1 和 case2 已经完成了前两层的处理
-    // 单边，要么，黑红红，要么，黑黑红
-    else if (parent->left == node)
-    {
-        if (parent->parent->left == parent)
+        // case3: 叔叔和父亲存在且都为红色。变色，父亲和叔叔变为黑色。祖父变为红色
+        if (gradpa->left != NULL && gradpa->left->color == RED && gradpa->right && gradpa->right->color == RED)
         {
-            node = RightRoate(parent->parent);
+            gradpa->color = RED;
+            gradpa->left->color = gradpa->right->color = BLACK;
+            return gradpa;
         }
-        else
+        else if (gradpa->left == parent && parent->left == node)
         {
-            // right node, left roate
-            node = LeftRoate(node->parent);
-            node = RightRoate(node->parent);
+            node = RightRoate(gradpa);
+        }
+        else if (gradpa->right == parent && parent->right == node)
+        {
+            node = LeftRoate(gradpa);
+        }
+        else if (gradpa->left == parent && parent->right == node)
+        {
+            gradpa->left = LeftRoate(gradpa->left);
+            node = RightRoate(gradpa);
+        }
+        else if (gradpa->right == parent && parent->left == node)
+        {
+            gradpa->right = RightRoate(gradpa->right);
+            node = LeftRoate(gradpa);
+        }
+
+        // 旋转过后，修改子树新根父节点的左右子树
+        if (node->parent)
+        {
+            if (node->value > node->parent->value)
+            {
+                node->parent->right = node;
+            }
+            else
+            {
+                node->parent->left = node;
+            }
         }
     }
     else
     {
-        if (parent->parent->right == parent)
-        {
-            node = LeftRoate(parent->parent);
-        }
-        else
-        {
-            node = RightRoate(node->parent);
-            node = LeftRoate(node->parent);
-        }
+        return parent;
     }
-
     return node;
-}
-
-PtrNode GetUncle(PtrNode node)
-{
-    if (node == NULL || node->parent == NULL || node->parent->parent == NULL)
-    {
-        return NULL;
-    }
-
-    else if (node->parent && node->parent == node->parent->parent->left)
-    {
-        return node->parent->parent->right;
-    }
-    else
-    {
-        return node->parent->parent->left;
-    }
 }
 
 PtrNode NewNode(ElementType value, PtrNode parent)
@@ -164,6 +141,14 @@ PtrNode NewNode(ElementType value, PtrNode parent)
     node->left = node->right = NULL;
     node->parent = parent;
     node->value = value;
+    if (parent && value > parent->value)
+    {
+        parent->right = node;
+    }
+    else if (parent && value < parent->value)
+    {
+        parent->left = node;
+    }
     return node;
 }
 
