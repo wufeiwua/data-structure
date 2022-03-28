@@ -17,7 +17,7 @@
 
  */
 
-PtrNode FixAfterInsertion(PtrNode node);
+PtrNode FixAfterInsertion(PtrNode node, PtrNode root);
 PtrNode FixAfterDeletion(PtrNode node);
 PtrNode LeftRoate(PtrNode node);
 PtrNode RightRoate(PtrNode node);
@@ -42,96 +42,81 @@ PtrNode Insert(ElementType value, PtrNode root)
     }
 
     cur = NewNode(value, parent);
-    // // 从当前节点自底向上平衡
-    while (cur)
-    {
-        cur = FixAfterInsertion(cur);
-        if (cur->parent == NULL)
-        {
-            cur->color = BLACK;
-            root = cur;
-            break;
-        }
-    }
+    // 从当前节点自底向上修正红黑树
+    root = FixAfterInsertion(cur, root);
     return root;
 }
 
 PtrNode Delete(ElementType value);
 PtrNode Get(ElementType value);
 
-PtrNode FixAfterInsertion(PtrNode node)
+PtrNode FixAfterInsertion(PtrNode node, PtrNode root)
 {
-    if (node == NULL)
+    // 父亲是红色节点才需要修正，否则直接插入。root 肯定是 黑色
+    while (node != NULL)
     {
-        return node;
-    }
-    // 当前节点如果是黑色，直接处理父亲节点
-    if (node->color == BLACK)
-    {
-        return node->parent;
-    }
-
-    PtrNode parent = node->parent;
-
-    // case1: 父节点为空，此节点是根节点
-    if (parent == NULL)
-    {
-        node->color = BLACK;
-        return node;
-    }
-    // case2: 父亲是黑色节点，直接插入
-    else if (parent->color == BLACK)
-    {
-        return parent;
-    }
-
-    PtrNode gradpa = parent->parent;
-    if (gradpa)
-    {
-        // case3: 叔叔和父亲存在且都为红色。变色，父亲和叔叔变为黑色。祖父变为红色
-        if (gradpa->left != NULL && gradpa->left->color == RED && gradpa->right && gradpa->right->color == RED)
+        PtrNode parent = node->parent;
+        // case1: 父节点为空，此节点是根节点
+        if (parent == NULL)
         {
-            gradpa->color = RED;
-            gradpa->left->color = gradpa->right->color = BLACK;
-            return gradpa;
+            root = node;
+            node->color = BLACK;
+            return root;
         }
-        else if (gradpa->left == parent && parent->left == node)
+        // 父节点为红色
+        else if (parent->color == RED)
         {
-            node = RightRoate(gradpa);
-        }
-        else if (gradpa->right == parent && parent->right == node)
-        {
-            node = LeftRoate(gradpa);
-        }
-        else if (gradpa->left == parent && parent->right == node)
-        {
-            gradpa->left = LeftRoate(gradpa->left);
-            node = RightRoate(gradpa);
-        }
-        else if (gradpa->right == parent && parent->left == node)
-        {
-            gradpa->right = RightRoate(gradpa->right);
-            node = LeftRoate(gradpa);
-        }
-
-        // 旋转过后，修改子树新根父节点的左右子树
-        if (node->parent)
-        {
-            if (node->value > node->parent->value)
+            PtrNode gradpa = parent->parent;
+            // 左子树
+            if (parent == gradpa->left)
             {
-                node->parent->right = node;
+                // case3: 叔叔存在且为红色
+                if (gradpa->right && gradpa->right->color == RED)
+                {
+                    gradpa->color = RED;
+                    gradpa->left->color = gradpa->right->color = BLACK;
+                    // 以祖父为新节点，继续向上
+                    node = gradpa;
+                }
+                // case4: 父亲是左子树，右旋
+                else
+                {
+                    if (parent->right == node)
+                    {
+                        gradpa->left = LeftRoate(parent);
+                    }
+                    node = RightRoate(gradpa);
+                }
             }
+            // 右子树
             else
             {
-                node->parent->left = node;
+                // case3: 叔叔存在且为红色
+                if (gradpa->left && gradpa->left->color == RED)
+                {
+                    gradpa->color = RED;
+                    gradpa->left->color = gradpa->right->color = BLACK;
+                    // 以祖父为新节点，继续向上
+                    node = gradpa;
+                }
+                // case5: 父亲是右子树，左旋
+                else
+                {
+                    if (parent->left == node)
+                    {
+                        gradpa->right = RightRoate(parent);
+                    }
+                    node = LeftRoate(gradpa);
+                }
             }
         }
+        // 父节点为黑色
+        else
+        {
+            return root;
+        }
     }
-    else
-    {
-        return parent;
-    }
-    return node;
+    return root;
 }
 
 PtrNode NewNode(ElementType value, PtrNode parent)
@@ -157,6 +142,7 @@ PtrNode LeftRoate(PtrNode node)
     PtrNode newRoot = node->right;
     node->right = newRoot->left;
     newRoot->left = node;
+
     // reset color
     newRoot->color = BLACK;
     node->color = RED;
@@ -164,6 +150,15 @@ PtrNode LeftRoate(PtrNode node)
     // reset parent
     newRoot->parent = node->parent;
     node->parent = newRoot;
+
+    // 旋转过后，修改子树新根父节点的左右子树
+    if (newRoot->parent)
+    {
+        if (newRoot->parent->left == node)
+            node->parent->left = newRoot;
+        else
+            newRoot->parent->right = newRoot;
+    }
     return newRoot;
 }
 
@@ -179,5 +174,14 @@ PtrNode RightRoate(PtrNode node)
     // reset parent
     newRoot->parent = node->parent;
     node->parent = newRoot;
+
+    // 旋转过后，修改子树新根父节点的左右子树
+    if (newRoot->parent)
+    {
+        if (newRoot->parent->left == node)
+            node->parent->left = newRoot;
+        else
+            newRoot->parent->right = newRoot;
+    }
     return newRoot;
 }
