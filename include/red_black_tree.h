@@ -20,9 +20,10 @@ typedef struct node
 } Node;
 
 typedef Node *PtrNode;
+typedef PtrNode *PtrRoot;
 
-PtrNode Insert(ElementType value, PtrNode node);
-PtrNode Delete(ElementType value);
-PtrNode Get(ElementType value);
+void Insert(ElementType value, PtrRoot root);
+void Delete(ElementType value, PtrRoot root);
+PtrNode Get(ElementType value, PtrRoot root);
 
 #endif

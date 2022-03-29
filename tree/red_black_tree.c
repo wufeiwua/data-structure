@@ -17,15 +17,15 @@
 
  */
 
-PtrNode FixAfterInsertion(PtrNode node, PtrNode root);
-PtrNode FixAfterDeletion(PtrNode node);
-PtrNode LeftRoate(PtrNode node);
-PtrNode RightRoate(PtrNode node);
+void FixAfterInsertion(PtrNode node, PtrRoot root);
+void FixAfterDeletion(PtrNode node, PtrRoot root);
+void LeftRoate(PtrNode node);
+void RightRoate(PtrNode node);
 PtrNode NewNode(ElementType value, PtrNode parent);
 
-PtrNode Insert(ElementType value, PtrNode root)
+void Insert(ElementType value, PtrRoot root)
 {
-    PtrNode cur = root;
+    PtrNode cur = *root;
     PtrNode parent = NULL;
     // 查找父节点
     while (cur != NULL)
@@ -43,14 +43,13 @@ PtrNode Insert(ElementType value, PtrNode root)
 
     cur = NewNode(value, parent);
     // 从当前节点自底向上修正红黑树
-    root = FixAfterInsertion(cur, root);
-    return root;
+    FixAfterInsertion(cur, root);
 }
 
-PtrNode Delete(ElementType value);
-PtrNode Get(ElementType value);
+void Delete(ElementType value, PtrRoot root);
+PtrNode Get(ElementType value, PtrRoot root);
 
-PtrNode FixAfterInsertion(PtrNode node, PtrNode root)
+void FixAfterInsertion(PtrNode node, PtrRoot root)
 {
     // 父亲是红色节点才需要修正，否则直接插入。root 肯定是 黑色
     while (node != NULL)
@@ -59,9 +58,9 @@ PtrNode FixAfterInsertion(PtrNode node, PtrNode root)
         // case1: 父节点为空，此节点是根节点
         if (parent == NULL)
         {
-            root = node;
             node->color = BLACK;
-            return root;
+            *root = node;
+            return;
         }
         // 父节点为红色
         else if (parent->color == RED)
@@ -83,9 +82,10 @@ PtrNode FixAfterInsertion(PtrNode node, PtrNode root)
                 {
                     if (parent->right == node)
                     {
-                        gradpa->left = LeftRoate(parent);
+                        node = node->parent;
+                        LeftRoate(parent);
                     }
-                    node = RightRoate(gradpa);
+                    RightRoate(gradpa);
                 }
             }
             // 右子树
@@ -104,19 +104,22 @@ PtrNode FixAfterInsertion(PtrNode node, PtrNode root)
                 {
                     if (parent->left == node)
                     {
-                        gradpa->right = RightRoate(parent);
+                        node = node->parent;
+                        RightRoate(parent);
                     }
-                    node = LeftRoate(gradpa);
+                    LeftRoate(gradpa);
                 }
             }
         }
-        // 父节点为黑色
         else
         {
-            return root;
+            return;
         }
     }
-    return root;
+    if (*root)
+    {
+        (*root)->color = BLACK;
+    }
 }
 
 PtrNode NewNode(ElementType value, PtrNode parent)
@@ -137,7 +140,7 @@ PtrNode NewNode(ElementType value, PtrNode parent)
     return node;
 }
 
-PtrNode LeftRoate(PtrNode node)
+void LeftRoate(PtrNode node)
 {
     PtrNode newRoot = node->right;
     node->right = newRoot->left;
@@ -159,14 +162,14 @@ PtrNode LeftRoate(PtrNode node)
         else
             newRoot->parent->right = newRoot;
     }
-    return newRoot;
 }
 
-PtrNode RightRoate(PtrNode node)
+void RightRoate(PtrNode node)
 {
     PtrNode newRoot = node->left;
     node->left = newRoot->right;
     newRoot->right = node;
+
     // reset color
     node->color = RED;
     newRoot->color = BLACK;
@@ -183,5 +186,4 @@ PtrNode RightRoate(PtrNode node)
         else
             newRoot->parent->right = newRoot;
     }
-    return newRoot;
 }
