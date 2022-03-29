@@ -142,6 +142,10 @@ PtrNode LeftRoate(PtrNode node)
     // reset parent
     newRoot->parent = node->parent;
     node->parent = newRoot;
+    if (node->right)
+    {
+        node->right->parent = node;
+    }
 
     // 旋转过后，修改子树新根父节点的左右子树
     if (newRoot->parent)
@@ -167,6 +171,10 @@ PtrNode RightRoate(PtrNode node)
     // reset parent
     newRoot->parent = node->parent;
     node->parent = newRoot;
+    if (node->left)
+    {
+        node->left->parent = node;
+    }
 
     // 旋转过后，修改子树新根父节点的左右子树
     if (newRoot->parent)

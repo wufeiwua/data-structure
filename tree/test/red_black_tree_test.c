@@ -24,6 +24,7 @@ int main(int argc, char const *argv[])
     Insert(85, root);
     Insert(80, root);
     Insert(90, root);
+    Insert(46, root);
 
     printf("inorder===\n");
     print_tree_inorder(*root);
