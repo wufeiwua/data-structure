@@ -8,30 +8,30 @@ void print_tree_postorder(PtrNode rootNode);
 
 int main(int argc, char const *argv[])
 {
-    PtrRoot root = (PtrRoot)malloc(sizeof(PtrNode));
-    Insert(30, root);
-    Insert(15, root);
-    Insert(10, root);
-    Insert(5, root);
-    Insert(20, root);
-    Insert(70, root);
-    Insert(60, root);
-    Insert(50, root);
-    Insert(40, root);
-    Insert(45, root);
-    Insert(55, root);
-    Insert(65, root);
-    Insert(85, root);
-    Insert(80, root);
-    Insert(90, root);
-    Insert(46, root);
+    PtrNode root = NULL;
+    Insert(30, &root);
+    Insert(15, &root);
+    Insert(10, &root);
+    Insert(5, &root);
+    Insert(20, &root);
+    Insert(70, &root);
+    Insert(60, &root);
+    Insert(50, &root);
+    Insert(40, &root);
+    Insert(45, &root);
+    Insert(55, &root);
+    Insert(65, &root);
+    Insert(85, &root);
+    Insert(80, &root);
+    Insert(90, &root);
+    Insert(46, &root);
 
     printf("inorder===\n");
-    print_tree_inorder(*root);
+    print_tree_inorder(root);
     printf("preorder===\n");
-    print_tree_preorder(*root);
+    print_tree_preorder(root);
     printf("postorder===\n");
-    print_tree_postorder(*root);
+    print_tree_postorder(root);
 
     return 0;
 }
