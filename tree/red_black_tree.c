@@ -22,6 +22,7 @@ void FixAfterDeletion(PtrNode node, PtrRoot root);
 PtrNode LeftRoate(PtrNode node);
 PtrNode RightRoate(PtrNode node);
 PtrNode NewNode(ElementType value, PtrNode parent);
+PtrNode FindMin(PtrNode node);
 
 void Insert(ElementType value, PtrRoot root)
 {
@@ -46,9 +47,120 @@ void Insert(ElementType value, PtrRoot root)
     FixAfterInsertion(cur, root);
 }
 
-void Delete(ElementType value, PtrRoot root);
-PtrNode Get(ElementType value, PtrRoot root);
+void Delete(ElementType value, PtrRoot root)
+{
+    PtrNode node = Get(value, root);
+    if (node == NULL)
+    {
+        // 该节点不存在
+        return;
+    }
 
+    // 转为删除一个孩子的情况
+    if (node->left && node->right)
+    {
+        // 找到右子树的最小值，此节点必定没有左子树
+        PtrNode min = FindMin(node->right);
+        node->value = min->value;
+        node->color = min->color;
+        node = min;
+    }
+
+    // 待删除节点只有一个子节点，或者没有儿子
+    PtrNode replacement = node->left ? node->left : node->right;
+    // 有一个儿子
+    if (replacement)
+    {
+        replacement->parent = node->parent;
+        // 待删除节点是根
+        if (node->parent == NULL)
+        {
+            *root = replacement;
+        }
+        else if (node == node->parent->left)
+        {
+            node->parent->left = replacement;
+        }
+        else
+        {
+            node->parent->right = replacement;
+        }
+
+        // 删除当前节点
+        node->parent = node->left = node->right = NULL;
+        if (node->color == BLACK)
+        {
+            // node 被删除，以被替代的节点为起点
+            FixAfterDeletion(replacement, root);
+        }
+        free(node);
+    }
+    // 没有儿子，且为根
+    else if (node->parent == NULL)
+    {
+        free(node);
+        *root = NULL;
+    }
+    // 没有儿子，不为根
+    else
+    {
+        // 黑色需要先修正
+        if (node->color == BLACK)
+        {
+            FixAfterDeletion(node, root);
+        }
+
+        // 删除该节点
+        if (node == node->parent->left)
+        {
+            node->parent->left = NULL;
+        }
+        else if (node == node->parent->right)
+        {
+            node->parent->right = NULL;
+        }
+        node->parent = NULL;
+        free(node);
+    }
+}
+PtrNode Get(ElementType value, PtrRoot root)
+{
+    PtrNode cur = *root;
+    while (cur != NULL)
+    {
+        if (value < cur->value)
+        {
+            cur = cur->left;
+        }
+        else if (value > cur->value)
+        {
+            cur = cur->right;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return cur;
+}
+
+PtrNode FindMin(PtrNode node)
+{
+    while (node != NULL && node->left != NULL)
+    {
+        node = node->left;
+    }
+    return node;
+}
+
+/*
+0. 此节点是根（没有父亲）： 变色（变为黑色）
+1. 父亲是黑色： 直接插入
+2. 父亲是红色：
+     1. 叔叔是黑色，或者没有叔叔： 旋转（单旋或者双旋）+变色（子树的根为黑色，子节点为红色）
+     2. 叔叔是红色： 变色 （叔叔和父亲变为黑色，祖父变为红色），然后以祖父为新的节点，继续向上平衡
+
+ */
 void FixAfterInsertion(PtrNode node, PtrRoot root)
 {
     // 父亲是红色节点才需要修正，否则直接插入。root 肯定是 黑色
@@ -109,6 +221,30 @@ void FixAfterInsertion(PtrNode node, PtrRoot root)
             return;
         }
     }
+}
+
+/*
+ */
+void FixAfterDeletion(PtrNode node, PtrRoot root)
+{
+    // while (node != *root && node->color == BLACK)
+    // {
+    //     if (node == node->parent->left)
+    //     {
+    //         PtrNode bro = node->parent->right;
+    //         if (bro && bro->color == RED)
+    //         {
+    //             bro->color = BLACK;
+    //             bro->parent->color = RED;
+    //             node = LeftRoate(node->parent);
+    //             bro = node->parent->right;
+    //         }
+    //     }
+    //     else
+    //     {
+    //     }
+    // }
+    // node->color = BLACK;
 }
 
 PtrNode NewNode(ElementType value, PtrNode parent)
