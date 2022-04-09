@@ -23,6 +23,7 @@ void LeftRoate(PtrNode node, PtrRoot root);
 void RightRoate(PtrNode node, PtrRoot root);
 PtrNode NewNode(ElementType value, PtrNode parent);
 PtrNode FindMin(PtrNode node);
+int IsBlack(PtrNode node);
 
 void Insert(ElementType value, PtrRoot root)
 {
@@ -66,10 +67,9 @@ void Delete(ElementType value, PtrRoot root)
     // 转为删除一个孩子的情况
     if (node->left && node->right)
     {
-        // 找到右子树的最小值，此节点必定没有左子树
+        // 找到右子树的最小值，此节点必定没有左子树，只复制值，并不复制颜色
         PtrNode min = FindMin(node->right);
         node->value = min->value;
-        node->color = min->color;
         node = min;
     }
 
@@ -130,6 +130,7 @@ void Delete(ElementType value, PtrRoot root)
         free(node);
     }
 }
+
 PtrNode Get(ElementType value, PtrRoot root)
 {
     PtrNode cur = *root;
@@ -158,6 +159,11 @@ PtrNode FindMin(PtrNode node)
         node = node->left;
     }
     return node;
+}
+
+int IsBlack(PtrNode node)
+{
+    return node == NULL || node->color == BLACK;
 }
 
 /*
@@ -231,24 +237,111 @@ void FixAfterInsertion(PtrNode node, PtrRoot root)
  */
 void FixAfterDeletion(PtrNode node, PtrRoot root)
 {
-    // while (node != *root && node->color == BLACK)
-    // {
-    //     if (node == node->parent->left)
-    //     {
-    //         PtrNode bro = node->parent->right;
-    //         if (bro && bro->color == RED)
-    //         {
-    //             bro->color = BLACK;
-    //             bro->parent->color = RED;
-    //             node = LeftRoate(node->parent);
-    //             bro = node->parent->right;
-    //         }
-    //     }
-    //     else
-    //     {
-    //     }
-    // }
-    // node->color = BLACK;
+    // 红色树特性：根节点外，黑色节点必有一个兄弟。否则会导致树不平衡(从任一结点到其每个叶子的所有路径都包含相同数目的黑色结点)
+    while (node != *root && node->color == BLACK)
+    {
+        if (node == node->parent->left)
+        {
+            PtrNode sib = node->parent->right;
+
+            // 如果兄弟是红色，那么父亲必定是黑色的。
+            // 兄弟存在且为红色。以父节点为根做一次旋转，但是此时还不能完全修复，需要继续判断
+            // 原有的兄弟变为祖父，且编程黑色。父亲变为红色，兄弟也会更新
+            if (sib->color == RED)
+            {
+                sib->color = BLACK;
+                sib->parent->color = RED;
+                LeftRoate(node->parent, root);
+                sib = node->parent->right;
+            }
+
+            // 兄弟为黑色，兄弟的孩子都是黑色。
+            if (IsBlack(sib->left) && IsBlack(sib->right))
+            {
+                // 兄弟和侄子都是黑色，父亲是红色
+                if (node->parent->color == RED)
+                {
+                    node->parent->color = BLACK;
+                    sib->color = RED;
+                    return;
+                }
+
+                // 父亲、兄弟、侄子都是黑色
+                sib->color = RED;
+                node = node->parent;
+            }
+            // 其中一个侄子为红色
+            else
+            {
+                // 兄弟为黑色，且右儿子为黑色，变为右儿子为红色情况，再继续平衡
+                if (sib->right == NULL || sib->right->color == BLACK)
+                {
+                    sib->color = RED;
+                    if (sib->left)
+                    {
+                        sib->left->color = BLACK;
+                    }
+                    RightRoate(sib, root);
+
+                    sib = node->parent->right;
+                }
+
+                // 最后一种情况，兄弟是黑色，右儿子是红色的
+                sib->color = node->parent->color;
+                sib->right->color = node->parent->color = BLACK;
+                LeftRoate(node->parent, root);
+                break;
+            }
+        }
+
+        // 镜像操作
+        else
+        {
+            PtrNode sib = node->parent->left;
+
+            if (sib->color == RED)
+            {
+                sib->color = BLACK;
+                sib->parent->color = RED;
+                RightRoate(node->parent, root);
+                sib = node->parent->left;
+            }
+
+            if (IsBlack(sib->left) && IsBlack(sib->right))
+            {
+                if (node->parent->color == RED)
+                {
+                    node->parent->color = BLACK;
+                    sib->color = RED;
+                    return;
+                }
+
+                sib->color = RED;
+                node = node->parent;
+            }
+            else
+            {
+                if (sib->left == NULL || sib->left->color == BLACK)
+                {
+                    sib->color = RED;
+                    if (sib->right)
+                    {
+                        sib->right->color = BLACK;
+                    }
+
+                    LeftRoate(sib, root);
+
+                    sib = node->parent->left;
+                }
+
+                sib->color = node->parent->color;
+                sib->left->color = node->parent->color = BLACK;
+                RightRoate(node->parent, root);
+                break;
+            }
+        }
+    }
+    node->color = BLACK;
 }
 
 PtrNode NewNode(ElementType value, PtrNode parent)

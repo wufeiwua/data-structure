@@ -26,6 +26,12 @@ int main(int argc, char const *argv[])
     Insert(90, &root);
     Insert(46, &root);
 
+    Delete(46, &root);
+    Delete(55, &root);
+    Delete(70, &root);
+    Delete(40, &root);
+    Delete(30, &root);
+
     printf("inorder===\n");
     print_tree_inorder(root);
     printf("preorder===\n");
