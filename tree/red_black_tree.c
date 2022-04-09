@@ -19,8 +19,8 @@
 
 void FixAfterInsertion(PtrNode node, PtrRoot root);
 void FixAfterDeletion(PtrNode node, PtrRoot root);
-PtrNode LeftRoate(PtrNode node);
-PtrNode RightRoate(PtrNode node);
+void LeftRoate(PtrNode node, PtrRoot root);
+void RightRoate(PtrNode node, PtrRoot root);
 PtrNode NewNode(ElementType value, PtrNode parent);
 PtrNode FindMin(PtrNode node);
 
@@ -43,6 +43,13 @@ void Insert(ElementType value, PtrRoot root)
     }
 
     cur = NewNode(value, parent);
+    if (parent == NULL)
+    {
+        // 根节点
+        cur->color = BLACK;
+        *root = cur;
+        return;
+    }
     // 从当前节点自底向上修正红黑树
     FixAfterInsertion(cur, root);
 }
@@ -164,63 +171,60 @@ PtrNode FindMin(PtrNode node)
 void FixAfterInsertion(PtrNode node, PtrRoot root)
 {
     // 父亲是红色节点才需要修正，否则直接插入。root 肯定是 黑色
-    while (node)
+    while (node && node != (*root) && node->parent && node->parent->color == RED)
     {
-        if (node->parent && node->parent->color == RED)
+        // 父亲是左子树
+        if (node->parent == node->parent->parent->left)
         {
-            if (node->parent->parent->right && node->parent->parent->right->color == RED && node->parent->parent->left && node->parent->parent->left->color == RED)
+            // 叔叔存在且是红色
+            PtrNode uncle = node->parent->parent->right;
+            if (uncle && uncle->color == RED)
             {
                 node->parent->parent->color = RED;
-                node->parent->parent->left->color = node->parent->parent->right->color = BLACK;
+                node->parent->color = uncle->color = BLACK;
                 // 以祖父为新节点，继续向上
                 node = node->parent->parent;
             }
-            // 父亲左子树
-            else if (node->parent == node->parent->parent->left)
+            else
             {
-
                 if (node->parent->right == node)
                 {
                     // 以父节点为根旋转
                     node = node->parent;
-                    node->parent->left = LeftRoate(node);
+                    LeftRoate(node, root);
                 }
-                node = RightRoate(node->parent->parent);
-                if (node->parent == NULL)
-                {
-                    node->color = BLACK;
-                    *root = node;
-                }
-                return;
+
+                node->parent->color = BLACK;
+                node->parent->parent->color = RED;
+                RightRoate(node->parent->parent, root);
             }
-            // 父亲右子树
+        }
+        // 父亲右子树
+        else
+        {
+            // 叔叔存在且是红色
+            PtrNode uncle = node->parent->parent->left;
+            if (uncle && uncle->color == RED)
+            {
+                node->parent->parent->color = RED;
+                node->parent->color = uncle->color = BLACK;
+                // 以祖父为新节点，继续向上
+                node = node->parent->parent;
+            }
             else
             {
-                // case5: 父亲是右子树，左旋
                 if (node->parent->left == node)
                 {
                     node = node->parent;
-                    RightRoate(node->parent);
+                    RightRoate(node->parent, root);
                 }
-                node = LeftRoate(node->parent->parent);
-                if (node->parent == NULL)
-                {
-                    node->color = BLACK;
-                    *root = node;
-                }
-                return;
+                node->parent->color = BLACK;
+                node->parent->parent->color = RED;
+                LeftRoate(node->parent->parent, root);
             }
-        }
-        else
-        {
-            if (node->parent == NULL)
-            {
-                node->color = BLACK;
-                *root = node;
-            }
-            return;
         }
     }
+    (*root)->color = BLACK;
 }
 
 /*
@@ -265,15 +269,11 @@ PtrNode NewNode(ElementType value, PtrNode parent)
     return node;
 }
 
-PtrNode LeftRoate(PtrNode node)
+void LeftRoate(PtrNode node, PtrRoot root)
 {
     PtrNode newRoot = node->right;
     node->right = newRoot->left;
     newRoot->left = node;
-
-    // reset color
-    newRoot->color = BLACK;
-    node->color = RED;
 
     // reset parent
     newRoot->parent = node->parent;
@@ -291,18 +291,17 @@ PtrNode LeftRoate(PtrNode node)
         else
             newRoot->parent->right = newRoot;
     }
-    return newRoot;
+    else
+    {
+        *root = newRoot;
+    }
 }
 
-PtrNode RightRoate(PtrNode node)
+void RightRoate(PtrNode node, PtrRoot root)
 {
     PtrNode newRoot = node->left;
     node->left = newRoot->right;
     newRoot->right = node;
-
-    // reset color
-    node->color = RED;
-    newRoot->color = BLACK;
 
     // reset parent
     newRoot->parent = node->parent;
@@ -320,5 +319,8 @@ PtrNode RightRoate(PtrNode node)
         else
             newRoot->parent->right = newRoot;
     }
-    return newRoot;
+    else
+    {
+        *root = newRoot;
+    }
 }
